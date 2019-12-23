@@ -1,7 +1,7 @@
 import numpy as np
 from OpenGL.GL import *
 
-GRID_SIZE = 9
+GRID_SIZE = 12
 THRESHOLD = 0.05
 
 EDGES = [
@@ -317,10 +317,6 @@ TRIANGLES = [
 class Vertex:
     def __init__(self, position):
         self.position = position
-        self.normal = np.empty(3, dtype=np.float)
-        self.normal[0] = 0.0
-        self.normal[1] = 0.0
-        self.normal[2] = 0.0
 
 
 class GridVertex(Vertex):
@@ -403,21 +399,12 @@ class Grid:
                                      edge_begin.position[1] + delta * (edge_end.position[1] - edge_begin.position[1]),
                                      edge_begin.position[2] + delta * (edge_end.position[2] - edge_begin.position[2])])
 
-                    vertex.normal[0] = edge_begin.normal[0] + delta * (edge_end.normal[0] - edge_begin.normal[0])
-                    vertex.normal[1] = edge_begin.normal[1] + delta * (edge_end.normal[1] - edge_begin.normal[1])
-                    vertex.normal[2] = edge_begin.normal[2] + delta * (edge_end.normal[2] - edge_begin.normal[2])
-
                     self.edges[edge] = vertex
 
             triangle_index = 0
             while TRIANGLES[index][triangle_index] != -1:
-                glNormal3fv(self.edges[TRIANGLES[index][triangle_index + 1]].normal)
                 glVertex3fv(self.edges[TRIANGLES[index][triangle_index + 1]].position)
-
-                glNormal3fv(self.edges[TRIANGLES[index][triangle_index]].normal)
                 glVertex3fv(self.edges[TRIANGLES[index][triangle_index]].position)
-
-                glNormal3fv(self.edges[TRIANGLES[index][triangle_index + 2]].normal)
                 glVertex3fv(self.edges[TRIANGLES[index][triangle_index + 2]].position)
 
                 triangle_index += 3

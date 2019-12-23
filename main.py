@@ -19,15 +19,21 @@ class MetaBall:
         self.radius = radius
 
 
+def load_shader(path, shader_type, program):
+    with open(path) as file:
+        shader = glCreateShader(shader_type)
+        glShaderSource(shader, file.read())
+        glCompileShader(shader)
+        glAttachShader(program, shader)
+
+
 def display():
     update()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
-    glEnable(GL_LIGHTING)
     glTranslatef(0.0, 0.0, -45.0)
     grid.draw()
-    glDisable(GL_LIGHTING)
 
     glutSwapBuffers()
 
@@ -53,9 +59,6 @@ def update():
 
     for vertex in grid.vertexes:
         vertex.value = 0.0
-        vertex.normal[0] = 0.
-        vertex.normal[1] = 0.
-        vertex.normal[2] = 0.
 
     for ball in balls:
         for vertex in grid.vertexes:
@@ -69,10 +72,6 @@ def update():
 
             scale = ball.radius / dist
             vertex.value += scale
-
-            vertex.normal[0] += point[0] * scale
-            vertex.normal[1] += point[1] * scale
-            vertex.normal[2] += point[2] * scale
 
     glutPostRedisplay()
 
@@ -90,14 +89,14 @@ glutCreateWindow(b"Bakhvalov Pavel - HW3 Metaballs + marching cubes")
 
 reshape(width, height)
 
+program = glCreateProgram()
+load_shader("vertex.glsl", GL_VERTEX_SHADER, program)
+load_shader("fragment.glsl", GL_FRAGMENT_SHADER, program)
+glLinkProgram(program)
+glUseProgram(program)
+
 glEnable(GL_DEPTH_TEST)
 glEnable(GL_NORMALIZE)
-
-glLightfv(GL_LIGHT1, GL_AMBIENT, [0., 0., 0.5, 1.])
-glLightfv(GL_LIGHT1, GL_DIFFUSE, [0., 0., 0.777, 1.])
-glLightfv(GL_LIGHT1, GL_POSITION, [-1., 1., 1., 0.])
-glLightfv(GL_LIGHT1, GL_SPECULAR, [1., 1., 1., 1.])
-glEnable(GL_LIGHT1)
 
 glutDisplayFunc(display)
 glutReshapeFunc(reshape)
